@@ -527,12 +527,12 @@ ExecutionVisualizer.prototype.render = function() {
       this.domRoot.find('#legendDiv')
           .append('<svg id="prevLegendArrowSVG"/> line that has just executed')
           .append('<p style="margin-top: 4px"><svg id="curLegendArrowSVG"/> next line to execute</p>');
-      
+
       myViz.domRootD3.select('svg#prevLegendArrowSVG')
           .append('polygon')
           .attr('points', SVG_ARROW_POLYGON)
           .attr('fill', lightArrowColor);
-      
+
       myViz.domRootD3.select('svg#curLegendArrowSVG')
           .append('polygon')
           .attr('points', SVG_ARROW_POLYGON)
@@ -631,7 +631,7 @@ ExecutionVisualizer.prototype.render = function() {
     if (this.params.codeDivHeight === undefined) {
       this.params.codeDivHeight = this.DEFAULT_EMBEDDED_CODE_DIV_HEIGHT;
     }
-    
+
     this.allowEditAnnotations = false;
 
     // add an extra label to link back to the main site, so that viewers
@@ -667,7 +667,7 @@ ExecutionVisualizer.prototype.render = function() {
     this.domRoot.find('#annotateBtn').hide();
   }
 
-  
+
   // not enough room for these extra buttons ...
   if (this.params.codeDivWidth &&
       this.params.codeDivWidth < 470) {
@@ -686,7 +686,7 @@ ExecutionVisualizer.prototype.render = function() {
 
   // enable left-right draggable pane resizer (originally from David Pritchard)
   this.domRoot.find('#codeDisplayDiv').resizable({
-    handles: "e", 
+    handles: "e",
     minWidth: 100, //otherwise looks really goofy
     resize: function(event, ui) { // old name: syncStdoutWidth, now not appropriate
       // resize stdout box in unison
@@ -708,7 +708,7 @@ ExecutionVisualizer.prototype.render = function() {
   // (note that we need to keep #globals_area separate from #stack for d3 to work its magic)
   this.domRoot.find("#globals_area").append('<div class="stackFrame" id="'
     + myViz.generateID('globals') + '"><div id="' + myViz.generateID('globals_header')
-    + '" class="stackFrameHeader">' + this.getRealLabel('Global frame') + '</div><table class="stackFrameVarTable" id="'
+    + '" class="stackFrameHeader" tabindex="0">' + this.getRealLabel('Global frame') + '</div><table class="stackFrameVarTable" id="'
     + myViz.generateID('global_table') + '"></table></div>');
 
 
@@ -1290,7 +1290,7 @@ ExecutionVisualizer.prototype.renderPyCodeOutput = function() {
       }
     });
 
- 
+
     // if there is a comment containing 'breakpoint' and this line was actually executed,
     // then set a breakpoint on this line
     var breakpointInComment = false;
@@ -1338,6 +1338,7 @@ ExecutionVisualizer.prototype.renderPyCodeOutput = function() {
         return myViz.generateID('cod' + d.lineNumber); // make globally unique (within the page)
       }
     })
+    .attr('tabindex', '0')
     .html(function(d, i) {
       if (i == 0) {
         return d.lineNumber;
@@ -1352,14 +1353,14 @@ ExecutionVisualizer.prototype.renderPyCodeOutput = function() {
   if (myViz.params.arrowLines) {
       myViz.domRoot.find('#pyCodeOutput tr:first')
           .prepend('<td id="gutterTD" valign="top" rowspan="' + this.codeOutputLines.length + '"><svg id="leftCodeGutterSVG"/></td>');
-      
+
       // create prevLineArrow and curLineArrow
       myViz.domRootD3.select('svg#leftCodeGutterSVG')
           .append('polygon')
           .attr('id', 'prevLineArrow')
           .attr('points', SVG_ARROW_POLYGON)
           .attr('fill', lightArrowColor);
-      
+
       myViz.domRootD3.select('svg#leftCodeGutterSVG')
           .append('polygon')
           .attr('id', 'curLineArrow')
@@ -1645,7 +1646,7 @@ ExecutionVisualizer.prototype.updateOutputFull = function(smoothTransition) {
   // bnm  Render a question
   if (curEntry.question) {
       //alert(curEntry.question.text);
-      
+
       $('#'+curEntry.question.div).modal({position:["25%","50%"]});
   }
 
@@ -1889,9 +1890,9 @@ ExecutionVisualizer.prototype.updateOutputFull = function(smoothTransition) {
         if (prevLineNumber) {
             var pla = myViz.domRootD3.select('#prevLineArrow');
             var translatePrevCmd = 'translate(0, ' + (((prevLineNumber - 1) * myViz.codeRowHeight) + myViz.arrowOffsetY + prevVerticalNudge) + ')';
-            
+
             if (smoothTransition) {
-                pla 
+                pla
                     .transition()
                     .duration(200)
                     .attr('fill', 'white')
@@ -1899,7 +1900,7 @@ ExecutionVisualizer.prototype.updateOutputFull = function(smoothTransition) {
                         pla
                             .attr('transform', translatePrevCmd)
                             .attr('fill', lightArrowColor);
-                        
+
                         gutterSVG.find('#prevLineArrow').show(); // show at the end to avoid flickering
                     });
             }
@@ -1907,18 +1908,18 @@ ExecutionVisualizer.prototype.updateOutputFull = function(smoothTransition) {
                 pla.attr('transform', translatePrevCmd)
                 gutterSVG.find('#prevLineArrow').show();
             }
-            
+
         }
         else {
             gutterSVG.find('#prevLineArrow').hide();
         }
-        
+
         if (curLineNumber) {
             var cla = myViz.domRootD3.select('#curLineArrow');
             var translateCurCmd = 'translate(0, ' + (((curLineNumber - 1) * myViz.codeRowHeight) + myViz.arrowOffsetY + curVerticalNudge) + ')';
-            
+
             if (smoothTransition) {
-                cla 
+                cla
                     .transition()
                     .delay(200)
                     .duration(250)
@@ -1927,7 +1928,7 @@ ExecutionVisualizer.prototype.updateOutputFull = function(smoothTransition) {
             else {
                 cla.attr('transform', translateCurCmd);
             }
-            
+
             gutterSVG.find('#curLineArrow').show();
         }
         else {
@@ -1985,9 +1986,9 @@ ExecutionVisualizer.prototype.updateOutputFull = function(smoothTransition) {
         myViz.domRoot.find('#pyCodeOutputDiv td.cod').removeClass('highlight-prev');
         myViz.domRoot.find('#pyCodeOutputDiv td.cod').removeClass('highlight-cur');
         if (curLineNumber)
-            myViz.domRoot.find('#'+myViz.generateID('cod'+curLineNumber)).addClass('highlight-cur');        
+            myViz.domRoot.find('#'+myViz.generateID('cod'+curLineNumber)).addClass('highlight-cur');
         if (prevLineNumber)
-            myViz.domRoot.find('#'+myViz.generateID('cod'+prevLineNumber)).addClass('highlight-prev');      
+            myViz.domRoot.find('#'+myViz.generateID('cod'+prevLineNumber)).addClass('highlight-prev');
     }
 
 
@@ -2678,7 +2679,8 @@ ExecutionVisualizer.prototype.renderDataStructures = function(curEntry, curTople
 
   globalVarTableCells.enter()
     .append('td')
-    .attr('class', function(d, i) {return (i == 0) ? 'stackFrameVar' : 'stackFrameValue';});
+    .attr('class', function(d, i) {return (i == 0) ? 'stackFrameVar' : 'stackFrameValue';})
+    .attr('tabindex', 0);
 
   // remember that the enter selection is added to the update
   // selection so that we can process it later ...
@@ -3436,17 +3438,17 @@ ExecutionVisualizer.prototype.renderPrimitiveObject = function(obj, d3DomElement
   var typ = typeof obj;
 
   if (obj == null) {
-    d3DomElement.append('<span class="nullObj">' + this.getRealLabel('None') + '</span>');
+    d3DomElement.append('<span class="nullObj" tabindex="0">' + this.getRealLabel('None') + '</span>');
   }
   else if (typ == "number") {
-    d3DomElement.append('<span class="numberObj">' + obj + '</span>');
+    d3DomElement.append('<span class="numberObj" tabindex="0">' + obj + '</span>');
   }
   else if (typ == "boolean") {
     if (obj) {
-      d3DomElement.append('<span class="boolObj">' + this.getRealLabel('True') + '</span>');
+      d3DomElement.append('<span class="boolObj" tabindex="0">' + this.getRealLabel('True') + '</span>');
     }
     else {
-      d3DomElement.append('<span class="boolObj">' + this.getRealLabel('False') + '</span>');
+      d3DomElement.append('<span class="boolObj" tabindex="0">' + this.getRealLabel('False') + '</span>');
     }
   }
   else if (typ == "string") {
@@ -3459,7 +3461,7 @@ ExecutionVisualizer.prototype.renderPrimitiveObject = function(obj, d3DomElement
     literalStr = literalStr.replace(new RegExp('\"', 'g'), '\\"'); // replace ALL
     literalStr = '"' + literalStr + '"';
 
-    d3DomElement.append('<span class="stringObj">' + literalStr + '</span>');
+    d3DomElement.append('<span class="stringObj" tabindex="0">' + literalStr + '</span>');
   }
   else if (typ == "object") {
     if (obj[0] == 'C_DATA') {
@@ -3636,8 +3638,8 @@ function(objID, stepNum, d3DomElement, isTopLevel) {
   }
 
   var hook_result = myViz.try_hook("renderCompoundObject",
-                             {objID:objID, d3DomElement:d3DomElement, 
-                              isTopLevel:isTopLevel, obj:obj, 
+                             {objID:objID, d3DomElement:d3DomElement,
+                              isTopLevel:isTopLevel, obj:obj,
                               typeLabelPrefix:typeLabelPrefix,
                               stepNum:stepNum,
                               myViz:myViz});
@@ -4352,7 +4354,7 @@ AnnotationBubble.prototype.showEditor = function() {
     }
   }));
 
-  
+
   $(this.qTipContentID()).find('textarea.bubbleInputText')
     // set handler when the textarea loses focus
     .blur(function() {
@@ -4606,14 +4608,14 @@ ExecutionVisualizer.prototype.activateJavaFrontend = function() {
     function(args) {
       var obj = args.obj, d3DomElement = args.d3DomElement;
       var typ = typeof obj;
-      if (obj == null) 
+      if (obj == null)
         d3DomElement.append('<span class="nullObj">null</span>');
-      else if (typ == "number") 
+      else if (typ == "number")
         d3DomElement.append('<span class="numberObj">' + obj + '</span>');
       else if (typ == "boolean") {
-        if (obj) 
+        if (obj)
           d3DomElement.append('<span class="boolObj">true</span>');
-        else 
+        else
           d3DomElement.append('<span class="boolObj">false</span>');
       }
       else if (obj instanceof Array && obj[0] == "VOID") {
@@ -4626,12 +4628,12 @@ ExecutionVisualizer.prototype.activateJavaFrontend = function() {
       else if (obj instanceof Array && obj[0] == "CHAR-LITERAL") {
         var asc = obj[1].charCodeAt(0);
         var ch = obj[1];
-        
+
         // default
         var show = asc.toString(16);
         while (show.length < 4) show = "0" + show;
         show = "\\u" + show;
-        
+
         if (ch == "\n") show = "\\n";
         else if (ch == "\r") show = "\\r";
         else if (ch == "\t") show = "\\t";
@@ -4641,7 +4643,7 @@ ExecutionVisualizer.prototype.activateJavaFrontend = function() {
         else if (ch == "\"") show = "\\\"";
         else if (ch == "\\") show = "\\\\";
         else if (asc >= 32) show = ch;
-        
+
         // stringObj to make monospace
         d3DomElement.append('<span class="stringObj">\'' + show + '\'</span>');
       }
@@ -4651,7 +4653,7 @@ ExecutionVisualizer.prototype.activateJavaFrontend = function() {
     });
 
   this.add_pytutor_hook(
-    "isPrimitiveType", 
+    "isPrimitiveType",
     function(args) {
       var obj = args.obj;
       if ((obj instanceof Array && obj[0] == "VOID")
@@ -4676,7 +4678,7 @@ ExecutionVisualizer.prototype.activateJavaFrontend = function() {
           escapeHtml(myViz.params.stdin.substr(stdinPosition));
         myViz.domRoot.find('#stdinShow').html(stdinContent);
       }
-      return [false]; 
+      return [false];
     });
 
   this.add_pytutor_hook(
@@ -4702,7 +4704,7 @@ ExecutionVisualizer.prototype.activateJavaFrontend = function() {
       if (myViz.hasStdout)
         for (var i=0; i<myViz.curTrace.length; i++)
           if (!(myViz.curTrace[i].stdout))
-              myViz.curTrace[i].stdout=" "; // always show it, if it's ever used      
+              myViz.curTrace[i].stdout=" "; // always show it, if it's ever used
     });
 
   this.add_pytutor_hook(
@@ -4713,7 +4715,7 @@ ExecutionVisualizer.prototype.activateJavaFrontend = function() {
       // uhh, dunno what this was for ...
       //myViz.domRoot.find('#pyStdout').attr('cols', 1); // commented out by pgbovine
       //myViz.domRoot.find('#pyStdout').attr('rows', Math.min(10, myViz.stdoutLines));
-      
+
       if (myViz.params.stdin && myViz.params.stdin != "") {
         var stdinHTML = '<div id="stdinWrap">stdin:<pre id="stdinShow" style="border:1px solid gray"></pre></div>';
         myViz.domRoot.find('#dataViz').append(stdinHTML);
@@ -4741,12 +4743,12 @@ ExecutionVisualizer.prototype.activateJavaFrontend = function() {
       var myViz = args.myViz;
       var stepNum = args.stepNum;
 
-      if (!(obj[0] == 'LIST' || obj[0] == 'QUEUE' || obj[0] == 'STACK')) 
+      if (!(obj[0] == 'LIST' || obj[0] == 'QUEUE' || obj[0] == 'STACK'))
         return [false]; // didn't handle
 
       var label = obj[0].toLowerCase();
       var visibleLabel = {list:'array', queue:'queue', stack:'stack'}[label];
-      
+
       if (obj.length == 1) {
         d3DomElement.append('<div class="typeLabel">' + typeLabelPrefix + 'empty ' + visibleLabel + '</div>');
         return [true]; //handled
@@ -4755,22 +4757,22 @@ ExecutionVisualizer.prototype.activateJavaFrontend = function() {
       d3DomElement.append('<div class="typeLabel">' + typeLabelPrefix + visibleLabel + '</div>');
       d3DomElement.append('<table class="' + label + 'Tbl"></table>');
       var tbl = d3DomElement.children('table');
-      
+
       if (obj[0] == 'LIST') {
         tbl.append('<tr></tr><tr></tr>');
         var headerTr = tbl.find('tr:first');
         var contentTr = tbl.find('tr:last');
-        
+
         // i: actual index in json object; ind: apparent index
         for (var i=1, ind=0; i<obj.length; i++) {
           var val = obj[i];
           var elide = val instanceof Array && val[0] == 'ELIDE';
-          
+
           // add a new column and then pass in that newly-added column
           // as d3DomElement to the recursive call to child:
           headerTr.append('<td class="' + label + 'Header"></td>');
           headerTr.find('td:last').append(elide ? "&hellip;" : ind);
-          
+
           contentTr.append('<td class="'+ label + 'Elt"></td>');
           if (!elide) {
             myViz.renderNestedObject(val, stepNum, contentTr.find('td:last'));
@@ -4786,7 +4788,7 @@ ExecutionVisualizer.prototype.activateJavaFrontend = function() {
      // Stack and Queue handling code by Will Gwozdz
       /* The table produced for stacks and queues is formed slightly differently than the others,
      missing the header row. Two rows made the dashed border not line up properly */
-      if (obj[0] == 'STACK') { 
+      if (obj[0] == 'STACK') {
         tbl.append('<tr></tr><tr></tr>');
         var contentTr = tbl.find('tr:last');
         contentTr.append('<td class="'+ label + 'FElt">'+'<span class="stringObj symbolic">&#8596;</span>'+'</td>');
@@ -4797,18 +4799,18 @@ ExecutionVisualizer.prototype.activateJavaFrontend = function() {
         });
         contentTr.append('<td class="'+ label + 'LElt">'+'</td>');
       }
-      
-      if (obj[0] == 'QUEUE') { 
+
+      if (obj[0] == 'QUEUE') {
         tbl.append('<tr></tr><tr></tr>');
-        var contentTr = tbl.find('tr:last');    
+        var contentTr = tbl.find('tr:last');
         // Add arrows showing in/out direction
-        contentTr.append('<td class="'+ label + 'FElt">'+'<span class="stringObj symbolic">&#8592;</span></td>');    
+        contentTr.append('<td class="'+ label + 'FElt">'+'<span class="stringObj symbolic">&#8592;</span></td>');
         $.each(obj, function(ind, val) {
           if (ind < 1) return; // skip type tag and ID entry
           contentTr.append('<td class="'+ label + 'Elt"></td>');
           myViz.renderNestedObject(val, stepNum, contentTr.find('td:last'));
         });
-        contentTr.append('<td class="'+ label + 'LElt">'+'<span class="stringObj symbolic">&#8592;</span></td>');    
+        contentTr.append('<td class="'+ label + 'LElt">'+'<span class="stringObj symbolic">&#8592;</span></td>');
       }
 
       return [true]; // did handle
