@@ -1138,7 +1138,7 @@ class DataVisualizer {
     // (note that we need to keep #globals_area separate from #stack for d3 to work its magic)
     this.domRoot.find("#globals_area").append('<div class="stackFrame" id="'
       + this.owner.generateID('globals') + '"><div id="' + this.owner.generateID('globals_header')
-      + '" class="stackFrameHeader">' + this.getRealLabel('Global frame') + '</div><table class="stackFrameVarTable" id="'
+      + '" class="stackFrameHeader" tabindex="0">' + this.getRealLabel('Global frame') + '</div><table class="stackFrameVarTable" id="'
       + this.owner.generateID('global_table') + '"></table></div>');
 
 
@@ -2500,17 +2500,17 @@ class DataVisualizer {
     var typ = typeof obj;
 
     if (obj == null) {
-      d3DomElement.append('<span class="nullObj">' + this.getRealLabel('None') + '</span>');
+      d3DomElement.append('<span class="nullObj" tabindex="0">' + this.getRealLabel('None') + '</span>');
     }
     else if (typ == "number") {
-      d3DomElement.append('<span class="numberObj">' + obj + '</span>');
+      d3DomElement.append('<span class="numberObj" tabindex="0">' + obj + '</span>');
     }
     else if (typ == "boolean") {
       if (obj) {
-        d3DomElement.append('<span class="boolObj">' + this.getRealLabel('True') + '</span>');
+        d3DomElement.append('<span class="boolObj" tabindex="0">' + this.getRealLabel('True') + '</span>');
       }
       else {
-        d3DomElement.append('<span class="boolObj">' + this.getRealLabel('False') + '</span>');
+        d3DomElement.append('<span class="boolObj" tabindex="0">' + this.getRealLabel('False') + '</span>');
       }
     }
     else if (typ == "string") {
@@ -3322,6 +3322,7 @@ class CodeDisplay {
           return this.owner.generateID('cod' + d.lineNumber); // make globally unique (within the page)
         }
       })
+      .attr('tabindex', '0')
       .html(function(d, i) {
         if (i == 0) {
           return d.lineNumber;
