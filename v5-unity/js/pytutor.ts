@@ -29,7 +29,7 @@
 
 require('./lib/d3.v2.min.js');
 require('./lib/jquery-3.0.0.min.js');
-require('./lib/jquery.jsPlumb-1.3.10-all-min.js'); // DO NOT UPGRADE ABOVE 1.3.10 OR ELSE BREAKAGE WILL OCCUR 
+require('./lib/jquery.jsPlumb-1.3.10-all-min.js'); // DO NOT UPGRADE ABOVE 1.3.10 OR ELSE BREAKAGE WILL OCCUR
 require('./lib/jquery-ui-1.11.4/jquery-ui.js');
 require('./lib/jquery-ui-1.11.4/jquery-ui.css');
 require('./lib/jquery.ba-bbq.js'); // contains slight pgbovine modifications
@@ -770,12 +770,12 @@ export class ExecutionVisualizer {
         else if (obj instanceof Array && obj[0] == "CHAR-LITERAL") {
           var asc = obj[1].charCodeAt(0);
           var ch = obj[1];
-          
+
           // default
           var show = asc.toString(16);
           while (show.length < 4) show = "0" + show;
           show = "\\u" + show;
-          
+
           if (ch == "\n") show = "\\n";
           else if (ch == "\r") show = "\\r";
           else if (ch == "\t") show = "\\t";
@@ -785,7 +785,7 @@ export class ExecutionVisualizer {
           else if (ch == "\"") show = "\\\"";
           else if (ch == "\\") show = "\\\\";
           else if (asc >= 32) show = ch;
-          
+
           // stringObj to make monospace
           d3DomElement.append('<span class="stringObj">\'' + show + '\'</span>');
         }
@@ -795,7 +795,7 @@ export class ExecutionVisualizer {
       });
 
     this.add_pytutor_hook(
-      "isPrimitiveType", 
+      "isPrimitiveType",
       function(args) {
         var obj = args.obj;
         if ((obj instanceof Array && obj[0] == "VOID")
@@ -820,14 +820,14 @@ export class ExecutionVisualizer {
             escapeHtml(myViz.params.stdin.substr(stdinPosition));
           myViz.domRoot.find('#stdinShow').html(stdinContent);
         }
-        return [false]; 
+        return [false];
       });
 
     this.add_pytutor_hook(
       "end_render",
       function(args) {
         var myViz = args.myViz;
-        
+
         if (myViz.params.stdin && myViz.params.stdin != "") {
           var stdinHTML = '<div id="stdinWrap">stdin:<pre id="stdinShow" style="border:1px solid gray"></pre></div>';
           myViz.domRoot.find('#dataViz').append(stdinHTML); // TODO: leaky abstraction with #dataViz
@@ -855,12 +855,12 @@ export class ExecutionVisualizer {
         var myViz = args.myViz;
         var stepNum = args.stepNum;
 
-        if (!(obj[0] == 'LIST' || obj[0] == 'QUEUE' || obj[0] == 'STACK')) 
+        if (!(obj[0] == 'LIST' || obj[0] == 'QUEUE' || obj[0] == 'STACK'))
           return [false]; // didn't handle
 
         var label = obj[0].toLowerCase();
         var visibleLabel = {list:'array', queue:'queue', stack:'stack'}[label];
-        
+
         if (obj.length == 1) {
           d3DomElement.append('<div class="typeLabel">' + typeLabelPrefix + 'empty ' + visibleLabel + '</div>');
           return [true]; //handled
@@ -869,22 +869,22 @@ export class ExecutionVisualizer {
         d3DomElement.append('<div class="typeLabel">' + typeLabelPrefix + visibleLabel + '</div>');
         d3DomElement.append('<table class="' + label + 'Tbl"></table>');
         var tbl = d3DomElement.children('table');
-        
+
         if (obj[0] == 'LIST') {
           tbl.append('<tr></tr><tr></tr>');
           var headerTr = tbl.find('tr:first');
           var contentTr = tbl.find('tr:last');
-          
+
           // i: actual index in json object; ind: apparent index
           for (var i=1, ind=0; i<obj.length; i++) {
             var val = obj[i];
             var elide = val instanceof Array && val[0] == 'ELIDE';
-            
+
             // add a new column and then pass in that newly-added column
             // as d3DomElement to the recursive call to child:
             headerTr.append('<td class="' + label + 'Header"></td>');
             headerTr.find('td:last').append(elide ? "&hellip;" : ind);
-            
+
             contentTr.append('<td class="'+ label + 'Elt"></td>');
             if (!elide) {
               myViz.renderNestedObject(val, stepNum, contentTr.find('td:last'));
@@ -900,7 +900,7 @@ export class ExecutionVisualizer {
        // Stack and Queue handling code by Will Gwozdz
         /* The table produced for stacks and queues is formed slightly differently than the others,
        missing the header row. Two rows made the dashed border not line up properly */
-        if (obj[0] == 'STACK') { 
+        if (obj[0] == 'STACK') {
           tbl.append('<tr></tr><tr></tr>');
           var contentTr = tbl.find('tr:last');
           contentTr.append('<td class="'+ label + 'FElt">'+'<span class="stringObj symbolic">&#8596;</span>'+'</td>');
@@ -911,18 +911,18 @@ export class ExecutionVisualizer {
           });
           contentTr.append('<td class="'+ label + 'LElt">'+'</td>');
         }
-        
-        if (obj[0] == 'QUEUE') { 
+
+        if (obj[0] == 'QUEUE') {
           tbl.append('<tr></tr><tr></tr>');
-          var contentTr = tbl.find('tr:last');    
+          var contentTr = tbl.find('tr:last');
           // Add arrows showing in/out direction
-          contentTr.append('<td class="'+ label + 'FElt">'+'<span class="stringObj symbolic">&#8592;</span></td>');    
+          contentTr.append('<td class="'+ label + 'FElt">'+'<span class="stringObj symbolic">&#8592;</span></td>');
           $.each(obj, function(ind, val) {
             if (ind < 1) return; // skip type tag and ID entry
             contentTr.append('<td class="'+ label + 'Elt"></td>');
             myViz.renderNestedObject(val, stepNum, contentTr.find('td:last'));
           });
-          contentTr.append('<td class="'+ label + 'LElt">'+'<span class="stringObj symbolic">&#8592;</span></td>');    
+          contentTr.append('<td class="'+ label + 'LElt">'+'<span class="stringObj symbolic">&#8592;</span></td>');
         }
 
         return [true]; // did handle
@@ -1138,7 +1138,7 @@ class DataVisualizer {
     // (note that we need to keep #globals_area separate from #stack for d3 to work its magic)
     this.domRoot.find("#globals_area").append('<div class="stackFrame" id="'
       + this.owner.generateID('globals') + '"><div id="' + this.owner.generateID('globals_header')
-      + '" class="stackFrameHeader" tabindex="0">' + this.getRealLabel('Global frame') + '</div><table class="stackFrameVarTable" id="'
+      + '" class="stackFrameHeader" tabindex="1">' + this.getRealLabel('Global frame') + '</div><table class="stackFrameVarTable" id="'
       + this.owner.generateID('global_table') + '"></table></div>');
 
 
@@ -1915,7 +1915,7 @@ class DataVisualizer {
 
     globalVarTableCells.enter()
       .append('td')
-      .attr('class', function(d, i) {return (i == 0) ? 'stackFrameVar' : 'stackFrameValue';});
+      .attr('class', function(d, i) {return (i == 0) ? 'stackFrameVar' : 'stackFrameValue';})
 
     // remember that the enter selection is added to the update
     // selection so that we can process it later ...
@@ -2146,7 +2146,7 @@ class DataVisualizer {
 
     stackVarTableCells.enter()
       .append('td')
-      .attr('class', function(d, i) {return (i == 0) ? 'stackFrameVar' : 'stackFrameValue';});
+      .attr('class', function(d, i) {return (i == 0) ? 'stackFrameVar' : 'stackFrameValue';})
 
     stackVarTableCells
       .order() // VERY IMPORTANT to put in the order corresponding to data elements
@@ -2486,6 +2486,26 @@ class DataVisualizer {
       highlight_frame(myViz.owner.generateID('globals'));
     }
 
+    for (var i = 0; i < curEntry.ordered_globals.length; i += 1) {
+      var varName = curEntry.ordered_globals[i];
+      var tabIndex = (i + 2).toString();
+      var obj = curEntry.globals[varName];
+
+      var stackRow = myViz.domRootD3.select('#v1__global__' + varName + '_tr');
+      stackRow.select('td.stackFrameVar')
+        .attr('tabindex', tabIndex);
+      if (!isHeapRef(obj, curEntry.heap)) {
+        stackRow.select('td.stackFrameValue')
+          .select('span')
+          .attr('tabindex', tabIndex);
+      } else {
+        var refId = getRefID(obj);
+        myViz.domRootD3.select('#v1__heap_object_' + refId + '_s' + curEntry.line)
+          .selectAll('span')
+          .attr('tabindex', tabIndex);
+      }
+    }
+
     myViz.owner.try_hook("end_renderDataStructures", {myViz:myViz.owner /* tricky! use owner to be safe */});
   }
 
@@ -2500,17 +2520,17 @@ class DataVisualizer {
     var typ = typeof obj;
 
     if (obj == null) {
-      d3DomElement.append('<span class="nullObj" tabindex="0">' + this.getRealLabel('None') + '</span>');
+      d3DomElement.append('<span class="nullObj">' + this.getRealLabel('None') + '</span>');
     }
     else if (typ == "number") {
-      d3DomElement.append('<span class="numberObj" tabindex="0">' + obj + '</span>');
+      d3DomElement.append('<span class="numberObj">' + obj + '</span>');
     }
     else if (typ == "boolean") {
       if (obj) {
-        d3DomElement.append('<span class="boolObj" tabindex="0">' + this.getRealLabel('True') + '</span>');
+        d3DomElement.append('<span class="boolObj">' + this.getRealLabel('True') + '</span>');
       }
       else {
-        d3DomElement.append('<span class="boolObj" tabindex="0">' + this.getRealLabel('False') + '</span>');
+        d3DomElement.append('<span class="boolObj">' + this.getRealLabel('False') + '</span>');
       }
     }
     else if (typ == "string") {
@@ -2704,8 +2724,8 @@ class DataVisualizer {
     }
 
     var hook_result = myViz.owner.try_hook("renderCompoundObject",
-                               {objID:objID, d3DomElement:d3DomElement, 
-                                isTopLevel:isTopLevel, obj:obj, 
+                               {objID:objID, d3DomElement:d3DomElement,
+                                isTopLevel:isTopLevel, obj:obj,
                                 typeLabelPrefix:typeLabelPrefix,
                                 stepNum:stepNum,
                                 myViz:myViz});
@@ -3322,7 +3342,7 @@ class CodeDisplay {
           return this.owner.generateID('cod' + d.lineNumber); // make globally unique (within the page)
         }
       })
-      .attr('tabindex', '0')
+      .attr('tabindex', '1')
       .html(function(d, i) {
         if (i == 0) {
           return d.lineNumber;
