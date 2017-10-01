@@ -3397,7 +3397,7 @@ class CodeDisplay {
       })
       .attr('aria-label', (d, i) => {
         if (i == 1) {
-          return htmlspecialchars(d.label);
+          return d.label;
         }
       })
       .html(function(d, i) {
