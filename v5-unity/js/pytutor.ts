@@ -2486,24 +2486,38 @@ class DataVisualizer {
       highlight_frame(myViz.owner.generateID('globals'));
     }
 
-    for (var i = 0; i < curEntry.ordered_globals.length; i += 1) {
-      var varName = curEntry.ordered_globals[i];
-      var tabIndex = (i + 2).toString();
-      var obj = curEntry.globals[varName];
+    function addTabIndicesToFrame(baseIndex, order, vars, frameName) {
+      for (var i = 0; i < order.length; i += 1) {
+        var varName = order[i];
+        var tabIndex = (baseIndex + i).toString();
+        var obj = vars[varName];
 
-      var stackRow = myViz.domRootD3.select('#v1__global__' + varName + '_tr');
-      stackRow.select('td.stackFrameVar')
-        .attr('tabindex', tabIndex);
-      if (!isHeapRef(obj, curEntry.heap)) {
-        stackRow.select('td.stackFrameValue')
-          .select('span')
+        var stackId = myViz.owner.generateID(frameName + '__' + varnameToCssID(varName));
+        var stackRow = myViz.domRootD3.select('#' + stackId + '_tr');
+        stackRow.select('td.stackFrameVar')
           .attr('tabindex', tabIndex);
-      } else {
-        var refId = getRefID(obj);
-        myViz.domRootD3.select('#v1__heap_object_' + refId + '_s' + curEntry.line)
-          .selectAll('span')
-          .attr('tabindex', tabIndex);
+        if (!isHeapRef(obj, curEntry.heap)) {
+          stackRow.select('td.stackFrameValue')
+            .select('span')
+            .attr('tabindex', tabIndex);
+        } else {
+          var refId = getRefID(obj);
+          var heapId = myViz.owner.generateID('heap_object_' + refId);
+          myViz.domRootD3.select('#' + heapId + '_s' + curEntry.line)
+            .selectAll('span')
+            .attr('tabindex', tabIndex);
+        }
       }
+    }
+
+    var currentTabIndex = 2;
+    addTabIndicesToFrame(currentTabIndex, curEntry.ordered_globals, curEntry.globals, 'global');
+
+    currentTabIndex += curEntry.ordered_globals.length;
+    for (var i = 0; i < curEntry.stack_to_render.length; i += 1) {
+      var frame = curEntry.stack_to_render[i];
+      addTabIndicesToFrame(currentTabIndex, frame.ordered_varnames, frame.encoded_locals, frame.unique_hash);
+      currentTabIndex += frame.ordered_varnames.length;
     }
 
     myViz.owner.try_hook("end_renderDataStructures", {myViz:myViz.owner /* tricky! use owner to be safe */});
@@ -3311,6 +3325,40 @@ class CodeDisplay {
     var myCodOutput = this; // capture
     this.domRoot.find('#pyCodeOutputDiv').empty();
 
+    function prependMetadata(str, data) {
+      var front = "line " + data.lineNumber + " , ";
+      if (data.breakpointHere) {
+        front.replace(/,/, "breakpoint");
+      }
+      return front + str;
+    }
+    var symbolRegex = /[-!$^()|{}\[\]";'?,\/\\]/g;
+    var symbolMappings = {
+      "-": " minus ",
+      "!": " exclamation mark ",
+      "?": " question mark ",
+      "^": " caret ",
+      "|": " bar ",
+      "{": " open brace ",
+      "}": " close brace ",
+      "[": " open bracket ",
+      "]": " close bracket ",
+      "(": " open paren ",
+      ")": " close paren ",
+      "/": " forward slash ",
+      "\\": " backslash ",
+      "#": " number sign ",
+      "$": " dollar sign ",
+      ";": " semicolon ",
+      "'": " tick ",
+      '"': " quote ",
+      ",": " comma "
+    };
+    this.owner.codeOutputLines.forEach(x => {
+      var symbolsReplaced = x.text.replace(symbolRegex, x => symbolMappings[x]);
+      x["label"] = prependMetadata(symbolsReplaced, x);
+    });
+
     // maps codeOutputLines down both table columns
     // TODO: get rid of pesky owner dependency
     var codeOutputD3 = this.domRootD3.select('#pyCodeOutputDiv')
@@ -3342,7 +3390,16 @@ class CodeDisplay {
           return this.owner.generateID('cod' + d.lineNumber); // make globally unique (within the page)
         }
       })
-      .attr('tabindex', '1')
+      .attr('tabindex', (d, i) => {
+        if (i == 1) {
+          return '1';
+        }
+      })
+      .attr('aria-label', (d, i) => {
+        if (i == 1) {
+          return htmlspecialchars(d.label);
+        }
+      })
       .html(function(d, i) {
         if (i == 0) {
           return d.lineNumber;
@@ -3396,12 +3453,18 @@ class CodeDisplay {
           d3.select(this.parentNode).select('td.lineNo').style('color', breakpointColor);
           d3.select(this.parentNode).select('td.lineNo').style('font-weight', 'bold');
           d3.select(this.parentNode).select('td.cod').style('color', breakpointColor);
+          var curLabel = d3.select(this.parentNode).select('td.cod').attr('aria-label');
+          curLabel = curLabel.replace(/,/, "breakpoint");
+          d3.select(this.parentNode).select('td.cod').attr('aria-label', curLabel);
         }
         else {
           myCodOutput.owner.unsetBreakpoint(d);
           d3.select(this.parentNode).select('td.lineNo').style('color', '');
           d3.select(this.parentNode).select('td.lineNo').style('font-weight', '');
           d3.select(this.parentNode).select('td.cod').style('color', '');
+          var curLabel = d3.select(this.parentNode).select('td.cod').attr('aria-label');
+          curLabel = curLabel.replace(/breakpoint/, ",");
+          d3.select(this.parentNode).select('td.cod').attr('aria-label', curLabel);
         }
       });
   }
