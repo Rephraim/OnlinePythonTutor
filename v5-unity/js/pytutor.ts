@@ -3332,7 +3332,7 @@ class CodeDisplay {
       }
       return front + str;
     }
-    var symbolRegex = /[-!$^()|{}\[\]";'?,\/\\]/g;
+    var symbolRegex = /[-!$^()|{}\[\]";:'?,\/\\]/g;
     var symbolMappings = {
       "-": " minus ",
       "!": " exclamation mark ",
@@ -3350,6 +3350,7 @@ class CodeDisplay {
       "#": " number sign ",
       "$": " dollar sign ",
       ";": " semicolon ",
+      ":": " colon ",
       "'": " tick ",
       '"': " quote ",
       ",": " comma "
