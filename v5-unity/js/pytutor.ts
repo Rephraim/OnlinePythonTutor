@@ -2495,17 +2495,20 @@ class DataVisualizer {
         var stackId = myViz.owner.generateID(frameName + '__' + varnameToCssID(varName));
         var stackRow = myViz.domRootD3.select('#' + stackId + '_tr');
         stackRow.select('td.stackFrameVar')
-          .attr('tabindex', tabIndex);
+          .attr('tabindex', tabIndex)
+          .attr('aria-label', 'stack frame var');
         if (!isHeapRef(obj, curEntry.heap)) {
           stackRow.select('td.stackFrameValue')
             .select('span')
-            .attr('tabindex', tabIndex);
+            .attr('tabindex', tabIndex)
+            .attr('aria-label', 'stack frame value');
         } else {
           var refId = getRefID(obj);
           var heapId = myViz.owner.generateID('heap_object_' + refId);
           myViz.domRootD3.select('#' + heapId + '_s' + curEntry.line)
             .selectAll('span')
-            .attr('tabindex', tabIndex);
+            .attr('tabindex', tabIndex)
+            .attr('aria-label', 'heap ref')
         }
       }
     }
