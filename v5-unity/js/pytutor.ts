@@ -1160,6 +1160,35 @@ class DataVisualizer {
     });
   }
 
+  // get a screen reader friendly version of 'str'
+  strToVerbalText(str) {
+    var symbolRegex = /[-!$^()|{}\[\]";:'?,\/\\]/g;
+    var symbolMappings = {
+      "-": " minus ",
+      "!": " exclamation mark ",
+      "?": " question mark ",
+      "^": " caret ",
+      "|": " bar ",
+      "{": " open brace ",
+      "}": " close brace ",
+      "[": " open bracket ",
+      "]": " close bracket ",
+      "(": " open paren ",
+      ")": " close paren ",
+      "/": " forward slash ",
+      "\\": " backslash ",
+      "#": " number sign ",
+      "$": " dollar sign ",
+      ";": " semicolon ",
+      ":": " colon ",
+      "'": " tick ",
+      '"': " quote ",
+      ",": " comma "
+    };
+
+    return str.replace(symbolRegex, x => symbolMappings[x]);
+  }
+
   height() {
     return this.domRoot.find('#dataViz').height();
   }
@@ -2486,7 +2515,7 @@ class DataVisualizer {
       highlight_frame(myViz.owner.generateID('globals'));
     }
 
-    function addTabIndicesToFrame(baseIndex, order, vars, frameName) {
+    function addAccessibilityTags(baseIndex, order, vars, frameName) {
       for (var i = 0; i < order.length; i += 1) {
         var varName = order[i];
         var tabIndex = (baseIndex + i).toString();
@@ -2496,30 +2525,29 @@ class DataVisualizer {
         var stackRow = myViz.domRootD3.select('#' + stackId + '_tr');
         stackRow.select('td.stackFrameVar')
           .attr('tabindex', tabIndex)
-          .attr('aria-label', 'stack frame var');
+          .attr('aria-label', myViz.strToVerbalText(varName));
         if (!isHeapRef(obj, curEntry.heap)) {
           stackRow.select('td.stackFrameValue')
             .select('span')
             .attr('tabindex', tabIndex)
-            .attr('aria-label', 'stack frame value');
+            .attr('aria-label', myViz.strToVerbalText(obj.toString()));
         } else {
           var refId = getRefID(obj);
           var heapId = myViz.owner.generateID('heap_object_' + refId);
           myViz.domRootD3.select('#' + heapId + '_s' + curEntry.line)
             .selectAll('span')
-            .attr('tabindex', tabIndex)
-            .attr('aria-label', 'heap ref')
+            .attr('tabindex', tabIndex);
         }
       }
     }
 
     var currentTabIndex = 2;
-    addTabIndicesToFrame(currentTabIndex, curEntry.ordered_globals, curEntry.globals, 'global');
+    addAccessibilityTags(currentTabIndex, curEntry.ordered_globals, curEntry.globals, 'global');
 
     currentTabIndex += curEntry.ordered_globals.length;
     for (var i = 0; i < curEntry.stack_to_render.length; i += 1) {
       var frame = curEntry.stack_to_render[i];
-      addTabIndicesToFrame(currentTabIndex, frame.ordered_varnames, frame.encoded_locals, frame.unique_hash);
+      addAccessibilityTags(currentTabIndex, frame.ordered_varnames, frame.encoded_locals, frame.unique_hash);
       currentTabIndex += frame.ordered_varnames.length;
     }
 
@@ -3335,31 +3363,10 @@ class CodeDisplay {
       }
       return front + str;
     }
-    var symbolRegex = /[-!$^()|{}\[\]";:'?,\/\\]/g;
-    var symbolMappings = {
-      "-": " minus ",
-      "!": " exclamation mark ",
-      "?": " question mark ",
-      "^": " caret ",
-      "|": " bar ",
-      "{": " open brace ",
-      "}": " close brace ",
-      "[": " open bracket ",
-      "]": " close bracket ",
-      "(": " open paren ",
-      ")": " close paren ",
-      "/": " forward slash ",
-      "\\": " backslash ",
-      "#": " number sign ",
-      "$": " dollar sign ",
-      ";": " semicolon ",
-      ":": " colon ",
-      "'": " tick ",
-      '"': " quote ",
-      ",": " comma "
-    };
+
+    // set each cose line's label to screen reader friendly text
     this.owner.codeOutputLines.forEach(x => {
-      var symbolsReplaced = x.text.replace(symbolRegex, x => symbolMappings[x]);
+      var symbolsReplaced = this.owner.dataViz.strToVerbalText(x.text);
       x["label"] = prependMetadata(symbolsReplaced, x);
     });
 
