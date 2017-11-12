@@ -2515,6 +2515,52 @@ class DataVisualizer {
       highlight_frame(myViz.owner.generateID('globals'));
     }
 
+    function generateHeapLabel(heapObj) {
+      var objType = heapObj[0];
+      var label;
+      if (objType === "CLASS") {
+        label = heapObj[1] + " class";
+      } else if (objType === "FUNCTION") {
+        label = "function " + myViz.strToVerbalText(heapObj[1]);
+      } else if (objType === "INSTANCE") {
+        label = heapObj[1] + " instance";
+      } else if (objType === "LIST") {
+        label = "list";
+      } else if (objType === "DICT") {
+        label = "dictionary";
+      } else if (objType === "SET") {
+        label = "set";
+      } else if (objType === "TUPLE") {
+        label = "tuple";
+      }
+      return label;
+    }
+
+    function getStringKeepQuotes(x) {
+      if (typeof x === 'string') {
+        return '"' + x + '"';
+      } else {
+        return x.toString();
+      }
+    }
+
+    function getHeapValue(heapObj, index) {
+      var objType = heapObj[0];
+      var value;
+      if (objType === "DICT") {
+        var arrNum = Math.floor(index / 2) + 1;
+        var arrInd = index % 2;
+        value =  heapObj[arrNum][arrInd];
+      } else if (objType === "TUPLE" || objType === "SET" || objType === "LIST") {
+        value = heapObj[index + 1];
+      } else if (objType === "INSTANCE" || objType === "CLASS") {
+        var arrNum = Math.floor(index / 2) + 2;
+        var arrInd = index % 2;
+        value = heapObj[arrNum][arrInd];
+      }
+      return getStringKeepQuotes(value);
+    }
+
     function addAccessibilityTags(baseIndex, order, vars, frameName) {
       for (var i = 0; i < order.length; i += 1) {
         var varName = order[i];
@@ -2530,13 +2576,16 @@ class DataVisualizer {
           stackRow.select('td.stackFrameValue')
             .select('span')
             .attr('tabindex', tabIndex)
-            .attr('aria-label', myViz.strToVerbalText(obj.toString()));
+            .attr('aria-label', myViz.strToVerbalText(getStringKeepQuotes(obj)));
         } else {
           var refId = getRefID(obj);
           var heapId = myViz.owner.generateID('heap_object_' + refId);
           myViz.domRootD3.select('#' + heapId + '_s' + curEntry.line)
+            .attr('tabindex', tabIndex)
+            .attr('aria-label', generateHeapLabel(curEntry.heap[refId]))
             .selectAll('span')
-            .attr('tabindex', tabIndex);
+            .attr('tabindex', tabIndex)
+            .attr('aria-label', (d, i) => myViz.strToVerbalText(getHeapValue(curEntry.heap[refId], i)));
         }
       }
     }
