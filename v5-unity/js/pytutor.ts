@@ -2580,7 +2580,8 @@ class DataVisualizer {
         } else {
           var refId = getRefID(obj);
           var heapId = myViz.owner.generateID('heap_object_' + refId);
-          myViz.domRootD3.select('#' + heapId + '_s' + curEntry.line)
+          console.log(myViz.owner);
+          myViz.domRootD3.select('#' + heapId + '_s' + myViz.owner.curInstr)
             .attr('tabindex', tabIndex)
             .attr('aria-label', generateHeapLabel(curEntry.heap[refId]))
             .selectAll('span')
