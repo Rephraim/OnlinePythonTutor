@@ -8,8 +8,7 @@ Python Tutor -- http://pythontutor.com/ -- helps people overcome a fundamental b
   - Added aria-label tags to data structures and stack frames to increase effectiveness of screen readers.
 - Bug Fixes
   - Tab indices on elements are accurate and allow easier tab navigation.
-- Known Bugs
-  - Not all symbols have mappings.
+- No Known Bugs
 
 
 ### Installation Instructions
