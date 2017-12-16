@@ -1,0 +1,11 @@
+Some work left to be done:
+
+Compatibility testing:
+  -Browsers (I doubt there will be issues, but might be prudent to check other browsers. Our team mostly used Chrome for testing.)
+  -Screen Readers (Check using other popular screen readers (JAWS, VoiceOver, etc.). Our team used NVDA)
+  
+User Testing and Feedback
+
+Possible Extra Features:
+
+  Compatibility with collaborative mode
